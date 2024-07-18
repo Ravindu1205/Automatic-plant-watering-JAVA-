@@ -1,0 +1,121 @@
+import org.firmata4j.IODeviceEventListener;
+
+import org.firmata4j.IOEvent;
+
+import org.firmata4j.Pin;
+
+import org.firmata4j.ssd1306.SSD1306;
+
+
+
+import java.io.IOException;
+
+public class ButtonListener implements IODeviceEventListener {
+
+    private final Pin ledPin;
+
+    private final Pin buttonPin;
+
+    Pin potentiometerPin;
+
+    SSD1306 display;
+
+
+
+    ButtonListener(Pin ledPin, Pin buttonPin) {
+
+        this.buttonPin = buttonPin;
+
+        this.ledPin = ledPin;
+
+    }
+
+
+
+    ButtonListener(Pin ledPin, Pin buttonPin, Pin potentiometerPin, SSD1306 display) {
+
+        this.buttonPin = buttonPin;
+
+        this.ledPin = ledPin;
+
+        this.potentiometerPin = potentiometerPin;
+
+        this.display = display;
+
+    }
+
+
+
+    @Override
+
+    public void onPinChange(IOEvent event) {
+
+        if (event.getPin().getIndex() != buttonPin.getIndex()) {
+
+            return;
+
+        }
+
+        try {
+
+            if (this.ledPin.getValue() == 0) {
+
+                this.ledPin.setValue(1);
+
+            } else {
+
+                this.ledPin.setValue(0);
+
+            }
+
+        } catch (IOException e) {
+
+            e.printStackTrace();
+
+        }
+
+        if (this.potentiometerPin != null && this.display != null) {
+
+            display.init();
+
+            display.getCanvas().clear();
+
+            String potValue = String.valueOf(potentiometerPin.getValue());
+
+            System.out.println("potentiometer value" + potValue);
+
+            display.getCanvas().drawString(4, 10, potValue);
+
+            display.display();
+
+        }
+
+    }
+
+
+
+    // These are empty methods (nothing in the curly braces)
+
+    @Override
+
+    public void onStart(IOEvent event) {
+
+    }
+
+
+
+    @Override
+
+    public void onStop(IOEvent event) {
+
+    }
+
+
+
+    @Override
+
+    public void onMessageReceive(IOEvent event, String message) {
+
+    }
+
+}
