@@ -1,0 +1,92 @@
+import org.firmata4j.I2CDevice;
+
+import org.firmata4j.IODevice;
+
+import org.firmata4j.Pin; // Firmata
+
+import org.firmata4j.firmata.FirmataDevice;
+
+import org.firmata4j.ssd1306.SSD1306;
+
+
+
+import java.io.IOException;
+
+import java.util.Timer;
+
+
+
+public class MinorProjectMainCode {
+
+
+
+    static final int D4 = 4;
+
+    static final int A2 = 16;
+
+    static final int D6 = 6;
+
+    static final int A1 = 15;
+
+
+
+    static final byte I2C0 = 0x3C;
+
+
+
+    public static void main(String[] args) throws InterruptedException, IOException {
+
+        var port = "COM3";
+
+
+
+        IODevice board = new FirmataDevice(port);
+
+        try {
+
+            board.start();
+
+            System.out.println("The board has started");
+
+            board.ensureInitializationIsDone();
+
+        } catch (Exception ex){
+
+            System.out.println("The board can't start");
+
+        }
+
+        finally {
+
+
+
+            var pump = board.getPin(4);
+
+            var sensor = board.getPin(15);
+
+
+
+            pump.setMode(Pin.Mode.OUTPUT);
+
+
+
+            I2CDevice i2cObject = board.getI2CDevice((byte)0x3C);
+
+            SSD1306 theOledObject = new SSD1306(i2cObject,SSD1306.Size.SSD1306_128_64);
+
+            theOledObject.init();
+
+            var timer = new Timer();
+
+            var task = new MinorProjectTaskCode(sensor,pump,timer,theOledObject);
+
+
+
+            timer.schedule(task,0,1000);
+
+        }
+
+    }
+
+}
+
