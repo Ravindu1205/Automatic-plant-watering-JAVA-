@@ -1,0 +1,137 @@
+import org.firmata4j.Pin; // Firmata
+
+import org.firmata4j.ssd1306.MonochromeCanvas;
+
+import org.firmata4j.ssd1306.SSD1306;
+
+
+
+import java.util.Timer;
+
+import java.util.TimerTask; // Timer tasks.
+
+public class MinorProjectTaskCode extends TimerTask {
+
+    private Pin sensor;
+
+    private Pin Pump;
+
+    private Timer myTimer;
+
+    private final SSD1306 theOledObject;
+
+
+
+    // The Constructor for ButtonTask
+
+    MinorProjectTaskCode(Pin pin, Pin pump, Timer timer, SSD1306 display) {
+
+        // Assign the externally-set "pin" to internal variable myPin
+
+        this.sensor = pin;
+
+        this.Pump = pump;
+
+        this.myTimer = timer;
+
+        theOledObject = display;
+
+    }
+
+
+
+    @Override
+
+    public void run() {
+
+        String string = String.valueOf(sensor.getValue());
+
+        System.out.println("Value: " + string);
+
+        if (this.sensor.getValue() >= 740) {
+
+            try {
+
+                System.out.println("Value: " + string);
+
+
+
+                System.out.println("The plant needs watering.");
+
+
+
+                theOledObject.getCanvas().clear();
+
+
+
+                theOledObject.getCanvas().drawString(0, 0, string);
+
+
+
+                theOledObject.getCanvas().drawHorizontalLine(0, 0, 100, MonochromeCanvas.Color.DARK);
+
+
+
+                theOledObject.getCanvas().drawHorizontalLine(0, 0, (int) sensor.getValue(), MonochromeCanvas.Color.BRIGHT);
+
+
+
+                theOledObject.display();
+
+
+
+                Pump.setValue(1);
+
+            } catch (Exception ex) {
+
+                System.out.println("Closed");
+
+            }
+
+        } else if (this.sensor.getValue() <= 556) {
+
+            try {
+
+                System.out.println("Value: " + string);
+
+                System.out.println("Done watering plant.");
+
+
+
+                theOledObject.getCanvas().clear();
+
+
+
+                theOledObject.getCanvas().drawString(0, 0, string);
+
+
+
+                theOledObject.getCanvas().drawHorizontalLine(0, 0, 100, MonochromeCanvas.Color.BRIGHT);
+
+
+
+                theOledObject.getCanvas().drawHorizontalLine(0, 0, 3, MonochromeCanvas.Color.DARK);
+
+
+
+                theOledObject.display();
+
+
+
+                Pump.setValue(0);
+
+            } catch (Exception ex) {
+
+                System.out.println("closed");
+
+            }
+
+
+
+        }
+
+
+
+    }
+
+}
